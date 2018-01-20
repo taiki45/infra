@@ -1,0 +1,28 @@
+#!/bin/bash
+set -eo pipefail
+
+bundle check
+
+if [ -z "${ITAMAE_IP}" ]; then
+  echo 'missing ITAMAE_IP'
+  exit 1
+fi
+
+if [ -z "${ITAMAE_PORT}" ]; then
+  echo 'missing ITAMAE_PORT'
+  exit 1
+fi
+
+if [ -z "${ITAMAE_BUCKET}" ]; then
+  echo 'missing ITAMAE_BUCKET'
+  exit 1
+fi
+
+if [ -d secrets ]; then
+  echo './secrets exists'
+  exit 1
+fi
+
+aws s3 sync "s3://${ITAMAE_BUCKET}/secrets" secrets
+bundle exec itamae ssh --sudo -h "${ITAMAE_IP}" -p "${ITAMAE_PORT}" -u pi --node-yaml secrets/pi.yml pi/default.rb "${@}"
+rm -r secrets
