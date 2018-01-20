@@ -1,4 +1,4 @@
-taiki45/infra
+infra
 =============
 
 run:
